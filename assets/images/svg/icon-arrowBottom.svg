@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="33px" height="48px" viewBox="0 0 33 48" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 42 (36781) - http://www.bohemiancoding.com/sketch -->
+    <title>Button_ Goto</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Profile---Settings" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Change-Details" transform="translate(-593.000000, -897.000000)" fill="#14CFFE">
+            <g id="Group" transform="translate(65.000000, 879.000000)">
+                <g id="Button_-Goto" transform="translate(528.000000, 18.000000)">
+                    <g id="Arrow-Button-Down" transform="translate(16.500000, 25.500000) scale(1, -1) rotate(90.000000) translate(-16.500000, -25.500000) translate(7.000000, 10.000000)">
+                        <path d="M13.7939418,30.0416982 C14.908735,31.1289577 16.7167777,31.1289577 17.8300723,30.0416982 C18.9448655,28.9549259 18.9448655,27.1907487 17.8300723,26.1030017 L6.78812583,15.4285714 L17.8305719,4.75450667 C18.9453649,3.66773447 18.9453649,1.90306978 17.8305719,0.815810163 C17.2736748,0.272424066 16.5424663,-6.16395823e-13 15.8122569,-6.16395823e-13 C15.0820473,-6.16395823e-13 14.3508389,0.272424066 13.7939418,0.815810163 L0.83646944,13.459406 C-0.278823147,14.5466655 -0.278823147,16.3103555 0.83646944,17.3981024 L13.7939418,30.0416982 L13.7939418,30.0416982 Z" id="Shape"></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

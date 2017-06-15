@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="80px" height="80px" viewBox="0 0 80 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 42 (36781) - http://www.bohemiancoding.com/sketch -->
+    <title>icon-add</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Webpage" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Desktop-3" transform="translate(-204.000000, -550.000000)" fill-rule="nonzero" fill="#FFFFFF">
+            <path d="M249,585 L249,555.004358 C249,552.244221 246.761424,550 244,550 C241.244195,550 239,552.240527 239,555.004358 L239,585 L209.004358,585 C206.244221,585 204,587.238576 204,590 C204,592.755805 206.240528,595 209.004358,595 L239,595 L239,624.995642 C239,627.755779 241.238576,630 244,630 C246.755805,630 249,627.759473 249,624.995642 L249,595 L278.995642,595 C281.755779,595 284,592.761424 284,590 C284,587.244195 281.759473,585 278.995642,585 L249,585 Z" id="icon-add"></path>
+        </g>
+    </g>
+</svg>

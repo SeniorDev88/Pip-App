@@ -1,0 +1,12 @@
+node_modules/**/*
+.exponent/**/*
+
+.vscode/settings.json
+
+.idea
+
+jsconfig.json
+
+.expo/**/*
+
+.DS_Store
