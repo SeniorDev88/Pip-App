@@ -1,5 +1,5 @@
 import React from "react";
-import { StackNavigation } from "@exponent/ex-navigation";
+import { StackNavigation } from "../components/ex-navigation";
 import NavBarLeft from '../components/NavBarLeft';
 import NavBarRight from '../components/NavBarRight';
 import { scaleByVertical } from '../constants/Layout';

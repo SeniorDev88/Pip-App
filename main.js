@@ -12,7 +12,7 @@ import * as firebase from "firebase";
 import {
   NavigationProvider,
   StackNavigation
-} from "@exponent/ex-navigation";
+} from "./components/ex-navigation";
 import Router from "./navigation/Router";
 import { scale, scaleByVertical } from './constants/Layout';
 

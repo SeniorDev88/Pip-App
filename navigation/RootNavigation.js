@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, Image } from "react-native";
-import { StackNavigation, TabNavigation, TabNavigationItem } from "@exponent/ex-navigation";
+import { StackNavigation, TabNavigation, TabNavigationItem } from "../components/ex-navigation";
 
 import HomeScreen from "../screens/HomeScreen";
 import BriefcaseScreen from "../screens/BriefcaseScreen";

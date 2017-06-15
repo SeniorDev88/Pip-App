@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import {StyleSheet, View, Text} from "react-native";
-import {TabNavigation, TabNavigationItem} from "@exponent/ex-navigation";
+import {TabNavigation, TabNavigationItem} from "../components/ex-navigation";
 import Icon from "../components/Icon";
 import HomeScreen from "../components/HomeScreen";
 import BriefCaseScreen from "../components/BriefCaseScreen";

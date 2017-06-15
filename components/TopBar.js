@@ -1,6 +1,6 @@
 import React, { PropTypes } from "react";
 import { TouchableHighlight, View, Text } from "react-native";
-import { withNavigation } from '@exponent/ex-navigation';
+import { withNavigation } from './ex-navigation';
 import Icon from './Icon';
 
 // Uses withNavigation to access this.props.navigator

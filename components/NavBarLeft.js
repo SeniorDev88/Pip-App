@@ -5,7 +5,7 @@ import {
   StyleSheet,
   Platform,
 } from 'react-native';
-import { withNavigation } from '@exponent/ex-navigation';
+import { withNavigation } from './ex-navigation';
 import { internalRouteMap } from "../navigation/Router";
 import Icon from './Icon';
 import { scale, scaleByVertical } from '../constants/Layout';

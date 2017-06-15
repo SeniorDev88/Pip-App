@@ -12,7 +12,6 @@
   },
   "dependencies": {
     "@expo/react-native-action-sheet": "^0.3.0",
-    "@exponent/ex-navigation": "~2.3.0",
     "@exponent/react-native-read-more-text": "^1.0.0",
     "@exponent/samples": "~1.0.2",
     "@exponent/vector-icons": "~2.0.3",

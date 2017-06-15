@@ -1,4 +1,4 @@
-import { createRouter } from '@exponent/ex-navigation';
+import { createRouter } from '../components/ex-navigation';
 
 import DealDetailScreen from '../screens/DealDetailScreen';
 import DealDetailAll from "../components/DealDetail/DealDetailAll";
