@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from "react";
-import { TouchableOpacity, ListView, View, Text, Image, StyleSheet } from "react-native";
+import { TouchableOpacity, ListView, View, Text, Image, StyleSheet, Animated, Dimensions } from "react-native";
 import Swiper from 'react-native-swiper';
 import { Components } from "exponent";
 import { generate } from "shortid";
@@ -7,14 +7,13 @@ import { scale } from '../../constants/Layout';
 import Tag from "../Tag";
 import Colors from '../../constants/Colors';
 
+import DealDetailAll from '../DealDetail/DealDetailAll';
+
 const styles = StyleSheet.create({
   container: {
-    marginTop: 10,
     borderColor: Colors.dirtyWhite,
     borderWidth: 1,
     borderStyle: 'solid',
-    marginBottom: 15,
-    borderRadius: 5,
     overflow: 'hidden'
   },
   topContainer: {
@@ -44,7 +43,6 @@ const styles = StyleSheet.create({
   },
   bgContainer: {
     zIndex: 1,
-    height: 140
   },
   bgImg: {
     flex: 1
@@ -113,8 +111,61 @@ export default class DealTileVanilla extends Component {
   };
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      showDetail: false,
+      margin: new Animated.Value(15),
+      height: new Animated.Value(200),
+      tileBottomTop: new Animated.Value(140),
+      borderRadius: new Animated.Value(5),
+    };
   }
+
+  componentWillReceiveProps(nextProps) {
+    if(nextProps.showDetail != this.state.showDetail) {
+      this.setState({ showDetail: nextProps.showDetail}, () => {
+        if(nextProps.showDetail) {
+          Animated.parallel([
+            Animated.timing(this.state.margin, {
+              toValue: 0,
+              duration: 300
+            }),
+            Animated.timing( this.state.tileBottomTop, {
+              toValue: 158,
+              duration: 300
+            }),
+            Animated.timing( this.state.height, {
+              toValue: Dimensions.get('window').height,
+              duration: 300
+            }),
+            Animated.timing(this.state.borderRadius, {
+              toValue: 0,
+              duration: 300
+            })
+          ]).start();
+        } else {
+          Animated.parallel([
+            Animated.timing(this.state.margin, {
+              toValue: 15,
+              duration: 300
+            }),
+            Animated.timing( this.state.tileBottomTop, {
+              toValue: 140,
+              duration: 300
+            }),
+            Animated.timing( this.state.height, {
+              toValue: 200,
+              duration: 300
+            }),
+            Animated.timing(this.state.borderRadius, {
+              toValue: 5,
+              duration: 300
+            })
+          ]).start();
+        }
+      });
+    }
+  }
+
   render() {
     const { deal, onPress } = this.props
     const {
@@ -128,57 +179,60 @@ export default class DealTileVanilla extends Component {
       dealTarget
     } = deal;
     return (
-      <View style={styles.container} >
-        <TouchableOpacity onPress={onPress}>
-          <View style={styles.topContainer} >
-            <Image
-              source={{ uri: dealLogo }}
-              style={styles.logo}
-            />
-            <Text style={styles.name} >{dealName}</Text>
-            <Image
-              source={{ uri: dealPlatformLogo }}
-              style={styles.platformLogo}
-            />
-          </View>
-          <View style={styles.bgContainer} >
-            <Image
-              source={{ uri: dealBgUrl }}
-              style={styles.bgImg}
-              resizeMode="cover"
-            />
-          </View>
-        </TouchableOpacity>
-        <Components.BlurView
-          tint="default"
-          intensity={100}
-          style={styles.bottomContainer}
-        >
-          <Swiper loop={false} >
-            <View style={styles.slide1} >
-              <View>
-                {dealTags.map(item => (
-                  <Tag
-                    text={item}
-                    key={generate()}
-                    style={styles.tag}
-                  />
-                ))}
+      <Animated.View style={[styles.container, {margin: this.state.margin, height: this.state.height, borderRadius: this.state.borderRadius }]} >
+        <View style={{flex: 1}}>
+          <TouchableOpacity onPress={onPress}>
+            <View style={styles.topContainer} >
+              <Image
+                source={{ uri: dealLogo }}
+                style={styles.logo}
+              />
+              <Text style={styles.name} >{dealName}</Text>
+              <Image
+                source={{ uri: dealPlatformLogo }}
+                style={styles.platformLogo}
+              />
+            </View>
+            <Animated.View style={[styles.bgContainer, {height: this.state.tileBottomTop}]} >
+              <Image
+                source={{ uri: dealBgUrl }}
+                style={styles.bgImg}
+                resizeMode="cover"
+              />
+            </Animated.View>
+          </TouchableOpacity>
+          <Components.BlurView
+            tint="default"
+            intensity={100}
+            style={styles.bottomContainer}
+          >
+            <Swiper loop={false} >
+              <View style={styles.slide1} >
+                <View>
+                  {dealTags.map(item => (
+                    <Tag
+                      text={item}
+                      key={generate()}
+                      style={styles.tag}
+                    />
+                  ))}
+                </View>
+                <Text style={styles.textCategory} >{dealCategory}</Text>
               </View>
-              <Text style={styles.textCategory} >{dealCategory}</Text>
-            </View>
-            <View style={styles.slide2} >
-              <Components.LinearGradient
-                colors={[Colors.darkTintColor, Colors.tintColor]}
-                style={styles.progressContainer}
-              >
-                <Text style={styles.risedText} >{`${dealRaised} raised`}</Text>
-              </Components.LinearGradient>
-              <Text style={styles.targetText} >{`${dealTarget} Target`}</Text>
-            </View>
-          </Swiper>
-        </Components.BlurView>
-      </View>
+              <View style={styles.slide2} >
+                <Components.LinearGradient
+                  colors={[Colors.darkTintColor, Colors.tintColor]}
+                  style={styles.progressContainer}
+                >
+                  <Text style={styles.risedText} >{`${dealRaised} raised`}</Text>
+                </Components.LinearGradient>
+                <Text style={styles.targetText} >{`${dealTarget} Target`}</Text>
+              </View>
+            </Swiper>
+          </Components.BlurView>
+        </View>
+        {this.state.showDetail ? <DealDetailAll from={this.props.from}/> : null}
+      </Animated.View>
     );
   }
 }

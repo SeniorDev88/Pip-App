@@ -5,7 +5,8 @@ import {
   View,
   Text,
   Image,
-  StatusBar
+  StatusBar,
+  Animated
 } from "react-native";
 import ParallaxScrollView from 'react-native-parallax-scroll-view';
 
@@ -28,7 +29,11 @@ const WIDTH = window.width;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    right: 0,
+    bottom: 0,
     backgroundColor: '#00EBC2'
   },
   background: {
@@ -79,66 +84,83 @@ class DealDetailAll extends Component {
       title: "DealDetail"
     }
   };
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      opacity: new Animated.Value(0),
+    }
+  }
+
+  componentDidMount() {
+    Animated.timing( this.state.opacity, {
+      toValue: 1,
+      duration: 300
+    }).start();
+  }
+
   render() {
     return (
-      <ParallaxScrollView
-        backgroundColor="#00EBC2"
-        headerBackgroundColor="pink"
-        stickyHeaderHeight={STICKY_HEADER_HEIGHT}
-        parallaxHeaderHeight={PARALLAX_HEADER_HEIGHT}
-        backgroundSpeed={10}
-        renderBackground={() => (
-          <View key="background">
-            <Image
-              source={{ uri: 'http://cdn.thegadgetflow.com/wp-content/uploads/2016/02/cocoon-smart-home-security-01.jpg',
-                width: window.width,
-                height: PARALLAX_HEADER_HEIGHT }}
-            />
-            <View
-              style={{ position: 'absolute',
-                top: 0,
-                width: window.width,
-                height: PARALLAX_HEADER_HEIGHT }}
-            />
-          </View>
-        )}
-        renderForeground={() => (<TopBar />)}
-        renderStickyHeader={() => (
-          <View key="sticky-header" style={styles.stickySection}>
-            <TopBar
-              title={<Text style={styles.stickySectionText}>N1CE FROZEN COCKTAILS</Text>}
-            />
-          </View>
-        )}
-      >
-        <StatusBar
-          translucent={false}
-          hidden={false}
-        />
-        <DealDetailLogo />
-        <DealDetailTitle />
-        <DealDetailLocation />
-        <DealDetailDescription />
-        <ProgressBar completePercentage={30} />
-        <Text
-          style={{
-            fontFamily: "GothamRounded-Book",
-            fontSize: 12,
-            lineHeight: 29,
-            color: "#388ba7",
-            textAlign: "center"
-          }}
-        >30% funded</Text>
-        <FundingStatistics />
-        <PlatformLogo
-          logoPath="http://3xrowsd5xzn1nczoz32qcdku.wpengine.netdna-cdn.com/wp-content/uploads/2016/03/Crowdcube_logo_exclusion_3a40fc925656b045955d392d7e9f9c80.jpg"
-          style={{
-            marginBottom: 20
-          }}
-        />
-        <SectionTabs />
-        <RiskWarning />
-      </ParallaxScrollView>
+      <Animated.View style={{position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, opacity: this.state.opacity}}>
+        <ParallaxScrollView
+          backgroundColor="#00EBC2"
+          headerBackgroundColor="pink"
+          stickyHeaderHeight={STICKY_HEADER_HEIGHT}
+          parallaxHeaderHeight={PARALLAX_HEADER_HEIGHT}
+          backgroundSpeed={10}
+          renderBackground={() => (
+            <View key="background">
+              <Image
+                source={{ uri: 'http://cdn.thegadgetflow.com/wp-content/uploads/2016/02/cocoon-smart-home-security-01.jpg',
+                  width: window.width,
+                  height: PARALLAX_HEADER_HEIGHT }}
+              />
+              <View
+                style={{ position: 'absolute',
+                  top: 0,
+                  width: window.width,
+                  height: PARALLAX_HEADER_HEIGHT }}
+              />
+            </View>
+          )}
+          renderForeground={() => (<TopBar />)}
+          renderStickyHeader={() => (
+            <View key="sticky-header" style={styles.stickySection}>
+              <TopBar
+                title={<Text style={styles.stickySectionText}>N1CE FROZEN COCKTAILS</Text>}
+              />
+            </View>
+          )}
+        >
+          <StatusBar
+            translucent={false}
+            hidden={false}
+          />
+          <DealDetailLogo />
+          <DealDetailTitle />
+          <DealDetailLocation />
+          <DealDetailDescription />
+          <ProgressBar completePercentage={30} />
+          <Text
+            style={{
+              fontFamily: "GothamRounded-Book",
+              fontSize: 12,
+              lineHeight: 29,
+              color: "#388ba7",
+              textAlign: "center"
+            }}
+          >30% funded</Text>
+          <FundingStatistics />
+          <PlatformLogo
+            logoPath="http://3xrowsd5xzn1nczoz32qcdku.wpengine.netdna-cdn.com/wp-content/uploads/2016/03/Crowdcube_logo_exclusion_3a40fc925656b045955d392d7e9f9c80.jpg"
+            style={{
+              marginBottom: 20
+            }}
+          />
+          <SectionTabs />
+          <RiskWarning />
+        </ParallaxScrollView>
+      </Animated.View>
     );
   }
 }

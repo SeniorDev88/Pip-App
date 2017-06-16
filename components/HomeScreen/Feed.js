@@ -3,7 +3,8 @@ import {
   StyleSheet,
   ScrollView,
   View,
-  StatusBar
+  StatusBar,
+  Animated,
 } from "react-native";
 import { scale, scaleByVertical } from '../../constants/Layout';
 import DealTileVanilla from "./DealTileVanilla";
@@ -18,10 +19,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#F9F9FC',
   },
   dealContainer: {
-    paddingHorizontal: scale(30),
+    flex: 1,
     borderBottomWidth: scale(1),
-    borderColor: '#A2B7C0',
-    marginTop: scaleByVertical(10)
+    borderColor: '#A2B7C0'
   }
 });
 
@@ -55,16 +55,34 @@ export default class Feed extends Component {
     }
   };
 
-  openDeal = () => {
-    PipEventEmitter.emit('hideTabBar');
-    PipEventEmitter.emit('tabDown');
-    PipEventEmitter.emit('hideNavBar');
-    PipEventEmitter.emit('navUp');
-    this.props.navigation.getNavigator('master').push('dealDetailAll',
-      {
-        dealId: 1,
-        dealName: opportunities.dealName
+  constructor(props) {
+    super(props);
+    this.state = {
+      dealId: '',
+      showDetail: false,
+      hideOthers: false,
+    }
+    this.dealTiles = [];
+  }
+
+  openDeal = (id) => {    
+    this.setState({
+      dealId: id,
+      showDetail: true
+    },() => {
+      PipEventEmitter.emit('hideTabBar');
+      PipEventEmitter.emit('tabDown');
+      PipEventEmitter.emit('hideNavBar');
+      PipEventEmitter.emit('navUp');
+      this.dealTiles[id].measure( (fx, fy, width, height, px, py) => {
+        this.refs.scrollView.scrollTo({y: fy});
       });
+
+      Animated.delay(300).start(() => {
+        this.setState({ hideOthers: true });
+        this.refs.scrollView.scrollTo({y: 0, animated: false});
+      })
+    });
   };
   openAddTag = () => this.props.navigator.push('addTag');
   openAllPips = () => this.props.navigator.push('mostViewed');
@@ -74,38 +92,60 @@ export default class Feed extends Component {
 
   render() {
     return (
-      <ScrollView>
+      <ScrollView ref='scrollView'>
         <View style={styles.container}>
           <StatusBar
             translucent={false}
             hidden={false}
           />
-          <HeadersFeed title={'PIP OF THE DAY'} />
-          <View style={styles.dealContainer}>
+          {this.state.hideOthers ? null : <HeadersFeed title={'PIP OF THE DAY'} /> }
+          {this.state.hideOthers && this.state.dealId != 1 ? null :
+          <View style={styles.dealContainer} ref={ (c) => { this.dealTiles[1] = c; } }>
             <DealTileVanilla
               deal={opportunities}
-              onPress={() => this.openDeal()}
+              onPress={() => this.openDeal(1)}
+              showDetail={this.state.showDetail && this.state.dealId == 1}
+              from='feed'
             />
-          </View>
-          <HeadersFeed title={'MOST VIEWED'} onPress={() => this.openAllPips()} />
-          <View style={styles.dealContainer}>
-            <DealTileVanilla deal={opportunities} onPress={() => this.openDeal()} />
-          </View>
-          <HeadersFeed title={'TODAY’S NEWS PIP'} />
+          </View>}
+          {this.state.hideOthers ? null : <HeadersFeed title={'MOST VIEWED'} onPress={() => this.openAllPips()} />}
+          {this.state.hideOthers && this.state.dealId != 2 ? null :
+          <View style={styles.dealContainer} ref={ (c) => { this.dealTiles[2] = c; } }>
+            <DealTileVanilla 
+              deal={opportunities} 
+              onPress={() => this.openDeal(2)} 
+              showDetail={this.state.showDetail && this.state.dealId == 2}
+              from='feed'
+              />
+          </View>}
+          {this.state.hideOthers ? null : <HeadersFeed title={'TODAY’S NEWS PIP'} />}
+          {this.state.hideOthers ? null :
           <View style={styles.dealContainer}>
             <RelatedArticles
               articles={relatedArticles}
             />
-          </View>
-          <HeadersFeed title={'TAG OF THE WEEK:'} tag={'Technology'} onPress={() => this.openAddTag()} />
-          <View style={styles.dealContainer}>
-            <DealTileVanilla deal={opportunities} onPress={() => this.openDeal()} />
-          </View>
-          <HeadersFeed title={'YOUR PIPS'} onPress={() => this.openYouPips()} />
-          <View style={styles.dealContainer}>
-            <DealTileVanilla deal={opportunities} onPress={() => this.openDeal()} />
-          </View>
-          <RiskWarning />
+          </View>}
+          {this.state.hideOthers ? null: <HeadersFeed title={'TAG OF THE WEEK:'} tag={'Technology'} onPress={() => this.openAddTag()} />}
+          {this.state.hideOthers && this.state.dealId != 3 ? null :
+          <View style={styles.dealContainer} ref={ (c) => { this.dealTiles[3] = c; } }>
+            <DealTileVanilla 
+              deal={opportunities} 
+              onPress={() => this.openDeal(3)} 
+              showDetail={this.state.showDetail && this.state.dealId == 3}
+              from='feed'
+              />
+          </View>}
+          {this.state.hideOthers ? null : <HeadersFeed title={'YOUR PIPS'} onPress={() => this.openYouPips()}/>}
+          {this.state.hideOthers && this.state.dealId != 4 ? null :
+          <View style={styles.dealContainer} ref={ (c) => { this.dealTiles[4] = c; } }>
+            <DealTileVanilla 
+              deal={opportunities} 
+              onPress={() => this.openDeal(4)} 
+              showDetail={this.state.showDetail && this.state.dealId == 4}
+              from='feed'
+              />
+          </View>}
+          {this.state.hideOthers ? null : <RiskWarning />}
         </View>
       </ScrollView>
     );
