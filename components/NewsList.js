@@ -6,6 +6,8 @@ import RelatedArticles from './RelatedArticles';
 import Tag from './Tag';
 import Colors from '../constants/Colors';
 
+import PipEventEmitter from '../services/PipEventEmitter';
+
 const window = Dimensions.get('window');
 
 const styles = StyleSheet.create({
@@ -65,6 +67,10 @@ const styles = StyleSheet.create({
 });
 
 const onPressImage = (props) => {
+  PipEventEmitter.emit('hideTabBar');
+  PipEventEmitter.emit('tabDown');
+  PipEventEmitter.emit('hideNavBar');
+  PipEventEmitter.emit('navUp');
   props.navigation.getNavigator('master').push(Router.getRoute('fullNews'));
 };
 

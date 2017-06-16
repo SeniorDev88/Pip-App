@@ -28,6 +28,8 @@ import ExNavigationAlertBar from './ExNavigationAlertBar';
 import * as NavigationStyles from './ExNavigationStyles';
 import SharedElementGroup from './shared-element/ExNavigationSharedElementGroup';
 
+import PipEventEmitter from '../../services/PipEventEmitter';
+
 const {
   Transitioner: NavigationTransitioner,
 } = NavigationExperimental;
@@ -288,7 +290,21 @@ class ExNavigationStack extends PureComponent<any, Props, State> {
       parentNavigatorUID: context.parentNavigatorUID,
       navigatingFromIndex: -1,
       navigatingToIndex: 0,
+      paddingTop: new Animated.Value(64),
     };
+
+    PipEventEmitter.addListener('navUp', () => {
+      Animated.timing( this.state.paddingTop, {
+        toValue: 0,
+        duration: 300
+      }).start();
+    });
+    PipEventEmitter.addListener('navDown', () => {
+      Animated.timing( this.state.paddingTop, {
+        toValue: this._getNavigationBarHeight(routeConfig),
+        duration: 300
+      }).start();
+    });
 
     this._routeListeners = {};
     this._useAnimation = true;
@@ -725,7 +741,7 @@ class ExNavigationStack extends PureComponent<any, Props, State> {
           ...style,
           isTranslucent ?
             styles.withNavigationBarTranslucent
-          : { paddingTop: this._getNavigationBarHeight(routeConfig) },
+          : { paddingTop: this.state.paddingTop },
         ];
       }
     } else {

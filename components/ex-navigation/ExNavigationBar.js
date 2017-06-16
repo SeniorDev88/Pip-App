@@ -12,6 +12,8 @@ import PureComponent from './utils/PureComponent';
 import { unsupportedNativeView } from './ExUnsupportedNativeView';
 import { withNavigation } from './ExNavigationComponents';
 
+import PipEventEmitter from '../../services/PipEventEmitter';
+
 let Components;
 if (global.__exponent) {
   Components = global.__exponent.Components;
@@ -180,7 +182,20 @@ export default class ExNavigationBar extends PureComponent {
     this.state = {
       visible: props.visible,
       delta: 0,
+      navTop: new Animated.Value(0),
     };
+    PipEventEmitter.addListener('hideNavBar', () => {
+      Animated.timing( this.state.navTop, {
+        toValue: - this.props.barHeight - this.props.statusBarHeight,
+        duration: 300
+      }).start();
+    });
+    PipEventEmitter.addListener('showNavBar', () => {
+      Animated.timing( this.state.navTop, {
+        toValue: 0,
+        duration: 300
+      }).start();
+    });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -243,10 +258,10 @@ export default class ExNavigationBar extends PureComponent {
     });
 
     const backgroundComponents = scenesProps.map(this._renderBackground, this);
-    const wrapperStyle = [styles.wrapper, { paddingTop: APPBAR_HEIGHT + this.props.statusBarHeight }];
+    const wrapperStyle = [styles.wrapper, { top: this.state.navTop }];
 
     return (
-      <View pointerEvents={this.props.visible ? 'auto' : 'none'} style={wrapperStyle}>
+      <Animated.View pointerEvents={this.props.visible ? 'auto' : 'none'} style={wrapperStyle}>
         {isTranslucent && (
           <Components.BlurView
             tint={translucentTint}
@@ -263,7 +278,7 @@ export default class ExNavigationBar extends PureComponent {
             {rightComponents}
           </View>
         </Animated.View>
-      </View>
+      </Animated.View>
     );
   }
 

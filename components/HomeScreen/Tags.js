@@ -13,6 +13,8 @@ import DealTileVanilla from "./DealTileVanilla";
 import HeadersFeed from "./HeadersFeed";
 import ImageTag from "./ImageTag";
 
+import PipEventEmitter from '../../services/PipEventEmitter';
+
 const styles = StyleSheet.create({
   container: {
     backgroundColor: Colors.boxBGColor,
@@ -121,6 +123,10 @@ export default class Tags extends Component {
     }
   };
   openDeal = () => {
+    PipEventEmitter.emit('hideTabBar');
+    PipEventEmitter.emit('tabDown');
+    PipEventEmitter.emit('hideNavBar');
+    PipEventEmitter.emit('navUp');
     this.props.navigation.getNavigator('master').push('dealDetailAll',
       {
         dealId: 1,

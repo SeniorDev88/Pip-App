@@ -9,6 +9,8 @@ import NavBarRight from '../NavBarRight';
 import ActionSheet from '../HomeScreen/ActionSheet';
 import Table from './Table';
 
+import PipEventEmitter from '../../services/PipEventEmitter';
+
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1
@@ -93,11 +95,15 @@ export default class Overview extends Component {
     this.setState({ modalVisible: false });
   }
   openDeal = () => {
-    this.props.navigation.getNavigator('master').push('dealDetailAll',
-      {
-        dealId: 1,
-        dealName: opportunities.dealName
-      });
+    PipEventEmitter.emit('hideTabBar');
+    PipEventEmitter.emit('tabDown');
+    PipEventEmitter.emit('hideNavBar');
+    PipEventEmitter.emit('navUp');
+    // this.props.navigation.getNavigator('master').push('dealDetailAll',
+    //   {
+    //     dealId: 1,
+    //     dealName: opportunities.dealName
+    //   });
   };
   pressedEventCallback = () => this.setState({ modalVisible: true });
   render() {

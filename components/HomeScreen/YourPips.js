@@ -9,6 +9,8 @@ import NavBarRight from '../NavBarRight';
 import ActionSheet from './ActionSheet';
 import DealTileVanilla from './DealTileVanilla';
 
+import PipEventEmitter from '../../services/PipEventEmitter';
+
 const opportunities = [
   {
     dealName: 'N1CE Cocktails',
@@ -220,6 +222,10 @@ export default class YourPips extends Component {
   pressedEventCallback = () => this.setState({ modalVisible: true });
 
   openDeal = () => {
+    PipEventEmitter.emit('hideTabBar');
+    PipEventEmitter.emit('tabDown');
+    PipEventEmitter.emit('hideNavBar');
+    PipEventEmitter.emit('navUp');
     this.props.navigation.getNavigator('master').push('dealDetailAll',
       {
         dealId: 1,

@@ -8,6 +8,7 @@ import React, {
 import {
   StyleSheet,
   View,
+  Animated,
 } from 'react-native';
 import PureComponent from '../utils/PureComponent';
 import StaticContainer from 'react-static-container';
@@ -23,6 +24,8 @@ import ExNavigationTabItem from './ExNavigationTabItem';
 import { createNavigatorComponent } from '../ExNavigationComponents';
 
 import type ExNavigationContext from '../ExNavigationContext';
+
+import PipEventEmitter from '../../../services/PipEventEmitter';
 
 export class ExNavigationTabContext extends ExNavigatorContext {
   type = 'tab';
@@ -124,7 +127,20 @@ class ExNavigationTab extends PureComponent<any, Props, State> {
       navigatorUID: props.navigatorUID,
       parentNavigatorUID: context.parentNavigatorUID,
       renderedTabKeys: [],
+      marginBottom: new Animated.Value(props.tabBarHeight || 0)
     };
+    PipEventEmitter.addListener('tabDown', () => {
+      Animated.timing( this.state.marginBottom, {
+        toValue: 0,
+        duration: 300
+      }).start();
+    });
+    PipEventEmitter.addListener('tabUp', () => {
+      Animated.timing( this.state.marginBottom, {
+        toValue: this.props.tabBarHeight || 56,
+        duration: 300
+      }).start();
+    });
   }
 
   render() {
@@ -155,10 +171,10 @@ class ExNavigationTab extends PureComponent<any, Props, State> {
     const isTranslucent = this.props.translucent;
 
     return (
-      <View style={styles.container}>
-        <View style={{flex: 1, marginBottom: isTranslucent ? 0 : tabBarHeight}}>
+      <View style={[styles.container, {}]}>
+        <Animated.View style={{flex: 1, marginBottom: this.state.marginBottom}}>
           {this.renderTabs()}
-        </View>
+        </Animated.View>
         {tabBar}
       </View>
     );

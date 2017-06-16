@@ -6,9 +6,11 @@ import {
   TouchableNativeFeedback,
   Text,
   View,
+  Animated,
 } from 'react-native';
 
 import { unsupportedNativeView } from '../ExUnsupportedNativeView';
+import PipEventEmitter from '../../../services/PipEventEmitter';
 
 let Components;
 if (global.__exponent) {
@@ -26,13 +28,32 @@ const DEFAULT_TAB_BAR_HEIGHT = 56;
 export default class ExNavigationTabBar extends React.Component {
   static defaultHeight = DEFAULT_TAB_BAR_HEIGHT;
 
+  constructor(props) {
+    super(props);
+    this.state = {
+      posBottom: new Animated.Value(0),
+    }
+    PipEventEmitter.addListener('hideTabBar', ()=>{
+      Animated.timing( this.state.posBottom, {
+        toValue: - props.height || DEFAULT_TAB_BAR_HEIGHT,
+        duration: 300
+      }).start();
+    });
+    PipEventEmitter.addListener('showTabBar', ()=>{
+      Animated.timing( this.state.posBottom, {
+        toValue: 0,
+        duration: 300
+      }).start();
+    });
+  }
+
   render() {
     const height = this.props.height || DEFAULT_TAB_BAR_HEIGHT;
     let isTranslucent = this.props.translucent;
     let backgroundColor = isTranslucent ? 'rgba(255,255,255,0.5)' : '#fefefe';
 
     return (
-      <View style={[styles.container, {height}]}>
+      <Animated.View style={[styles.container, {height: height, bottom: this.state.posBottom}]}>
         {isTranslucent &&
           <Components.BlurView style={[styles.translucentUnderlay, {height}]} />}
 
@@ -41,7 +62,7 @@ export default class ExNavigationTabBar extends React.Component {
             {this.renderTabItems()}
           </View>
         </View>
-      </View>
+      </Animated.View>
     );
   }
 
@@ -113,7 +134,6 @@ export default class ExNavigationTabBar extends React.Component {
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    bottom: 0,
     left: 0,
     right: 0,
     backgroundColor: 'transparent',

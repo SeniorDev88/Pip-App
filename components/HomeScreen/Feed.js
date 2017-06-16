@@ -11,6 +11,8 @@ import HeadersFeed from "./HeadersFeed";
 import RelatedArticles from "../RelatedArticles";
 import RiskWarning from "../RiskWarning";
 
+import PipEventEmitter from '../../services/PipEventEmitter';
+
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#F9F9FC',
@@ -54,6 +56,10 @@ export default class Feed extends Component {
   };
 
   openDeal = () => {
+    PipEventEmitter.emit('hideTabBar');
+    PipEventEmitter.emit('tabDown');
+    PipEventEmitter.emit('hideNavBar');
+    PipEventEmitter.emit('navUp');
     this.props.navigation.getNavigator('master').push('dealDetailAll',
       {
         dealId: 1,
