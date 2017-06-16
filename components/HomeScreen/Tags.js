@@ -3,7 +3,8 @@ import {
   StyleSheet,
   ScrollView,
   View,
-  StatusBar
+  StatusBar,
+  Animated
 } from "react-native";
 import Swiper from 'react-native-swiper';
 import { scale } from '../../constants/Layout';
@@ -122,16 +123,39 @@ export default class Tags extends Component {
       title: "TAGS",
     }
   };
-  openDeal = () => {
-    PipEventEmitter.emit('hideTabBar');
-    PipEventEmitter.emit('tabDown');
-    PipEventEmitter.emit('hideNavBar');
-    PipEventEmitter.emit('navUp');
-    this.props.navigation.getNavigator('master').push('dealDetailAll',
-      {
-        dealId: 1,
-        dealName: opportunities.dealName
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      showDetail: false,
+      hideOthers: false,
+    }
+    PipEventEmitter.addListener('hideDetail', (data) => {
+      if(data.from != 'tags') { return; }
+      this.setState({
+        showDetail: false,
+        hideOthers: false
       });
+    });
+  }
+
+  openDeal = () => {
+    this.setState({
+      showDetail: true
+    },() => {
+      PipEventEmitter.emit('hideTabBar');
+      PipEventEmitter.emit('tabDown');
+      PipEventEmitter.emit('hideNavBar');
+      PipEventEmitter.emit('navUp');
+      this.refs.dealContainer.measure( (fx, fy, width, height, px, py) => {
+        this.refs.scrollView.scrollTo({y: fy});
+      });
+
+      Animated.delay(300).start(() => {
+        this.setState({ hideOthers: true });
+        this.refs.scrollView.scrollTo({y: 0, animated: false});
+      })
+    });
   };
   renderTags = () => {
     const imageTags = tags.map(({ image, tag, onPress, id }) => (
@@ -161,7 +185,8 @@ export default class Tags extends Component {
           translucent={false}
           hidden={false}
         />
-        <ScrollView>
+        <ScrollView ref='scrollView'>
+          {this.state.hideOthers ? null : 
           <HeadersFeed
             title={'TAG OF THE WEEK:'}
             tag={'Alcohol'}
@@ -170,26 +195,37 @@ export default class Tags extends Component {
                 this.props.navigation.getNavigator('master').push('addTag');
               }
             }
-          />
-          <View style={styles.dealContainer}>
-            <DealTileVanilla deal={opportunities} onPress={() => this.openDeal()} />
+          />}          
+          <View ref='dealContainer' style={{
+            borderBottomWidth: scale(2),
+            marginBottom: scale(34),
+            borderColor: Colors.boxBGBorderColor,}}>
+            <DealTileVanilla
+              deal={opportunities}
+              onPress={() => this.openDeal()}
+              showDetail={this.state.showDetail}
+              from='tags'
+            />
           </View>
-          <HeadersFeed title={'MOST POPULAR'} />
-          <View style={styles.dealContainer}>
-            <Swiper
-              paginationStyle={styles.paggination}
-              loop={false}
-              height={scale(424)}
-              dotStyle={styles.dot}
-              activeDotColor={Colors.tintColor}
-            >
+          {this.state.hideOthers ? null : 
+          <View style={{flex: 1}}>
+            <HeadersFeed title={'MOST POPULAR'} />
+            <View style={styles.dealContainer}>
+              <Swiper
+                paginationStyle={styles.paggination}
+                loop={false}
+                height={scale(424)}
+                dotStyle={styles.dot}
+                activeDotColor={Colors.tintColor}
+              >
+                {this.renderTags()}
+              </Swiper>
+            </View>
+            <HeadersFeed title={'EXPLORE TAGS'} />
+            <View style={styles.dealContainer}>
               {this.renderTags()}
-            </Swiper>
-          </View>
-          <HeadersFeed title={'EXPLORE TAGS'} />
-          <View style={styles.dealContainer}>
-            {this.renderTags()}
-          </View>
+            </View>
+          </View>}
         </ScrollView>
       </View>
     );

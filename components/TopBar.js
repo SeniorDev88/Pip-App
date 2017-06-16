@@ -3,13 +3,23 @@ import { TouchableHighlight, View, Text } from "react-native";
 import { withNavigation } from './ex-navigation';
 import Icon from './Icon';
 
+import PipEventEmitter from '../services/PipEventEmitter';
+
 // Uses withNavigation to access this.props.navigator
 // https://github.com/exponent/ex-navigation
 @withNavigation
 class TopBar extends React.Component {
 
+  constructor(props) {
+    super(props);
+  }
+
   goBack = () => {
-    this.props.navigator.pop();
+      PipEventEmitter.emit('hideDetail', {from: this.props.from});
+      PipEventEmitter.emit('showTabBar');
+      PipEventEmitter.emit('tabUp');
+      PipEventEmitter.emit('showNavBar');
+      PipEventEmitter.emit('navDown');
   }
 
   render() {

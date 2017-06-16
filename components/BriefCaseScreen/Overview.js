@@ -84,6 +84,9 @@ export default class Overview extends Component {
     this.state = {
       modalVisible: false
     };
+    PipEventEmitter.addListener('hideDetail', () =>{
+
+    });
   }
   componentWillMount() {
     this._buttonPressSubscription = this.props.route.getEventEmitter().addListener('filter', this.pressedEventCallback);

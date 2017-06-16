@@ -301,7 +301,7 @@ class ExNavigationStack extends PureComponent<any, Props, State> {
     });
     PipEventEmitter.addListener('navDown', () => {
       Animated.timing( this.state.paddingTop, {
-        toValue: this._getNavigationBarHeight(routeConfig),
+        toValue: 64,
         duration: 300
       }).start();
     });

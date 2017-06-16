@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from "react";
-import { InteractionManager, TouchableHighlight, ScrollView, ListView, View, Text, Image, StatusBar } from "react-native";
+import { InteractionManager, TouchableHighlight, ScrollView, ListView, View, Text, Image, StatusBar, Animated } from "react-native";
 import { Components } from "exponent";
 import { scale } from '../../constants/Layout';
 import { generate } from "shortid";
@@ -13,6 +13,7 @@ import PipEventEmitter from '../../services/PipEventEmitter';
 
 const opportunities = [
   {
+    dealId: 1,
     dealName: 'N1CE Cocktails',
     dealCategory: 'REVENUE',
     dealBgUrl: 'https://cdn.crowdfundinsider.com/wp-content/uploads/2016/05/n1ce.png',
@@ -23,6 +24,7 @@ const opportunities = [
     dealTarget: '$1M'
   },
   {
+    dealId: 2,
     dealName: 'N1CE Cocktails',
     dealCategory: 'REVENUE',
     dealBgUrl: 'https://cdn.crowdfundinsider.com/wp-content/uploads/2016/05/n1ce.png',
@@ -33,6 +35,7 @@ const opportunities = [
     dealTarget: '$1M'
   },
   {
+    dealId: 3,
     dealName: 'N1CE Cocktails',
     dealCategory: 'REVENUE',
     dealBgUrl: 'https://cdn.crowdfundinsider.com/wp-content/uploads/2016/05/n1ce.png',
@@ -43,6 +46,7 @@ const opportunities = [
     dealTarget: '$1M'
   },
   {
+    dealId: 4,
     dealName: 'N1CE Cocktails',
     dealCategory: 'REVENUE',
     dealBgUrl: 'https://cdn.crowdfundinsider.com/wp-content/uploads/2016/05/n1ce.png',
@@ -53,6 +57,7 @@ const opportunities = [
     dealTarget: '$1M'
   },
   {
+    dealId: 5,
     dealName: 'N1CE Cocktails',
     dealCategory: 'REVENUE',
     dealBgUrl: 'https://cdn.crowdfundinsider.com/wp-content/uploads/2016/05/n1ce.png',
@@ -184,12 +189,6 @@ renderRow.propTypes = {
 
 
 export default class YourPips extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      modalVisible: false
-    };
-  }
 
   static route = {
     navigationBar: {
@@ -210,6 +209,30 @@ export default class YourPips extends Component {
     }),
   };
 
+  constructor(props) {
+    super(props);
+    this.state = {
+      modalVisible: false,
+      routeName: '',
+      dealId: '',
+      showDetail: false,
+      hideOthers: false,
+      titleMarginTop: new Animated.Value(0),
+    };
+    this.dealTiles = [];
+    PipEventEmitter.addListener('hideDetail', (data) => {
+      if(data.from != 'yourpips') { return; }
+      this.setState({ hideOthers: false }, () => {
+        Animated.timing( this.state.titleMarginTop, {
+          toValue: 0,
+          duration: 300
+        }).start(() => {
+          this.setState({ showDetail: false });
+        });
+      });
+    });
+  }
+
   componentWillMount() {
     this._buttonPressSubscription = this.props.route.getEventEmitter().addListener('filter', this.pressedEventCallback);
   }
@@ -220,17 +243,30 @@ export default class YourPips extends Component {
     this.setState({ modalVisible: false });
   }
   pressedEventCallback = () => this.setState({ modalVisible: true });
-
-  openDeal = () => {
-    PipEventEmitter.emit('hideTabBar');
-    PipEventEmitter.emit('tabDown');
-    PipEventEmitter.emit('hideNavBar');
-    PipEventEmitter.emit('navUp');
-    this.props.navigation.getNavigator('master').push('dealDetailAll',
-      {
-        dealId: 1,
-        dealName: opportunities.dealName
+  openDeal = (id) => {
+    this.setState({
+      dealId: id,
+      showDetail: true
+    },() => {
+      PipEventEmitter.emit('hideTabBar');
+      PipEventEmitter.emit('tabDown');
+      PipEventEmitter.emit('hideNavBar');
+      PipEventEmitter.emit('navUp');
+      this.dealTiles[id].measure( (fx, fy, width, height, px, py) => {
+        this.refs.scrollView.scrollTo({y: fy});
       });
+
+      Animated.sequence([
+        Animated.delay(300),
+        Animated.timing( this.state.titleMarginTop, {
+          toValue: -49,
+          duration: 300
+        })
+      ]).start( () => {
+        this.refs.scrollView.scrollTo({y: 0, animated: false});
+        this.setState({ hideOthers: true });
+      })
+    });
   };
 
   render() {
@@ -240,10 +276,19 @@ export default class YourPips extends Component {
           translucent={false}
           hidden={false}
         />
-        <PageTitle>Equity</PageTitle>
-        <ScrollView style={{paddingHorizontal: scale(30)}}>
-          {opportunities.map(item => (
-            <DealTileVanilla key={Math.random()} deal={item} onPress={() => this.openDeal()} />
+        <Animated.View style={{marginTop: this.state.titleMarginTop}}><PageTitle>Equity</PageTitle></Animated.View>
+        <ScrollView ref='scrollView'>
+          {opportunities.map((item, index) => (
+            this.state.hideOthers && this.state.dealId != item.dealId ? null :
+            <View key={'dealContainer'+index} style={{flex: 1}} ref={ (c) => { this.dealTiles[item.dealId] = c; } }>
+              <DealTileVanilla
+                key={'dealTile'+item.dealId}
+                deal={item}
+                onPress={() => this.openDeal(item.dealId)}
+                showDetail={this.state.showDetail && this.state.dealId == item.dealId}
+                from='yourpips'
+              />
+            </View>
           ))}
         </ScrollView>
         <ActionSheet show={this.state.modalVisible} onCancel={() => this.onCancel()} />

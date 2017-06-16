@@ -63,6 +63,13 @@ export default class Feed extends Component {
       hideOthers: false,
     }
     this.dealTiles = [];
+    PipEventEmitter.addListener('hideDetail', (data) => {
+      if(data.from != 'feed') { return; }
+      this.setState({
+        showDetail: false,
+        hideOthers: false
+      });
+    });
   }
 
   openDeal = (id) => {    

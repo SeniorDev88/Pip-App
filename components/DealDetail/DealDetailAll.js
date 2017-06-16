@@ -123,11 +123,12 @@ class DealDetailAll extends Component {
               />
             </View>
           )}
-          renderForeground={() => (<TopBar />)}
+          renderForeground={() => (<TopBar from={this.props.from}/>)}
           renderStickyHeader={() => (
             <View key="sticky-header" style={styles.stickySection}>
               <TopBar
                 title={<Text style={styles.stickySectionText}>N1CE FROZEN COCKTAILS</Text>}
+                from={this.props.from}
               />
             </View>
           )}
