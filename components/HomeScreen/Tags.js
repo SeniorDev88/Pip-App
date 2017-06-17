@@ -143,10 +143,12 @@ export default class Tags extends Component {
     this.setState({
       showDetail: true
     },() => {
-      PipEventEmitter.emit('hideTabBar');
-      PipEventEmitter.emit('tabDown');
       PipEventEmitter.emit('hideNavBar');
       PipEventEmitter.emit('navUp');
+      setTimeout( () => {
+        PipEventEmitter.emit('hideTabBar');
+        PipEventEmitter.emit('tabDown');
+      }, 300);
       this.refs.dealContainer.measure( (fx, fy, width, height, px, py) => {
         this.refs.scrollView.scrollTo({y: fy});
       });

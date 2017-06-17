@@ -248,10 +248,12 @@ export default class YourPips extends Component {
       dealId: id,
       showDetail: true
     },() => {
-      PipEventEmitter.emit('hideTabBar');
-      PipEventEmitter.emit('tabDown');
       PipEventEmitter.emit('hideNavBar');
       PipEventEmitter.emit('navUp');
+      setTimeout( () => {
+        PipEventEmitter.emit('hideTabBar');
+        PipEventEmitter.emit('tabDown');
+      }, 300);
       this.dealTiles[id].measure( (fx, fy, width, height, px, py) => {
         this.refs.scrollView.scrollTo({y: fy});
       });

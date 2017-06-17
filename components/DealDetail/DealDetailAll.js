@@ -89,6 +89,8 @@ class DealDetailAll extends Component {
     super(props);
     this.state = {
       opacity: new Animated.Value(0),
+      contentMarginTop: new Animated.Value(300),
+      backgroundColor: 'transparent',
     }
   }
 
@@ -96,14 +98,18 @@ class DealDetailAll extends Component {
     Animated.timing( this.state.opacity, {
       toValue: 1,
       duration: 300
-    }).start();
+    }).start( () => {
+      this.setState({
+        backgroundColor: "#00EBC2"
+      })
+    });
   }
 
   render() {
     return (
       <Animated.View style={{position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, opacity: this.state.opacity}}>
         <ParallaxScrollView
-          backgroundColor="#00EBC2"
+          backgroundColor={this.state.backgroundColor}
           headerBackgroundColor="pink"
           stickyHeaderHeight={STICKY_HEADER_HEIGHT}
           parallaxHeaderHeight={PARALLAX_HEADER_HEIGHT}

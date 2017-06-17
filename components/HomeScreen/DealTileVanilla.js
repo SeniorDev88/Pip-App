@@ -116,6 +116,7 @@ export default class DealTileVanilla extends Component {
       margin: new Animated.Value(15),
       height: new Animated.Value(200),
       tileBottomTop: new Animated.Value(140),
+      tileOpacity: new Animated.Value(1),
       borderRadius: new Animated.Value(5),
     };
   }
@@ -124,42 +125,58 @@ export default class DealTileVanilla extends Component {
     if(nextProps.showDetail != this.state.showDetail) {
       this.setState({ showDetail: nextProps.showDetail}, () => {
         if(nextProps.showDetail) {
-          Animated.parallel([
-            Animated.timing(this.state.margin, {
-              toValue: 0,
-              duration: 300
-            }),
-            Animated.timing( this.state.tileBottomTop, {
-              toValue: 158,
-              duration: 300
-            }),
-            Animated.timing( this.state.height, {
-              toValue: Dimensions.get('window').height,
-              duration: 300
-            }),
-            Animated.timing(this.state.borderRadius, {
-              toValue: 0,
-              duration: 300
-            })
+          Animated.sequence([
+            Animated.parallel([
+              Animated.timing(this.state.margin, {
+                toValue: 0,
+                duration: 300
+              }),
+              Animated.timing(this.state.borderRadius, {
+                toValue: 0,
+                duration: 300
+              }),
+              Animated.timing( this.state.height, {
+                toValue: Dimensions.get('window').height,
+                duration: 300
+              })
+            ]),
+            Animated.parallel([
+              Animated.timing( this.state.tileBottomTop, {
+                toValue: 158,
+                duration: 300
+              }),              
+              Animated.timing( this.state.tileOpacity, {
+                toValue: 0,
+                duration: 300
+              })
+            ])
           ]).start();
         } else {
-          Animated.parallel([
-            Animated.timing(this.state.margin, {
-              toValue: 15,
-              duration: 300
-            }),
-            Animated.timing( this.state.tileBottomTop, {
-              toValue: 140,
-              duration: 300
-            }),
-            Animated.timing( this.state.height, {
-              toValue: 200,
-              duration: 300
-            }),
-            Animated.timing(this.state.borderRadius, {
-              toValue: 5,
-              duration: 300
-            })
+          Animated.sequence([
+            Animated.parallel([
+              Animated.timing( this.state.tileBottomTop, {
+                toValue: 140,
+                duration: 300
+              }),              
+              Animated.timing( this.state.tileOpacity, {
+                toValue: 1,
+                duration: 300
+              }),
+            ]),
+            Animated.parallel([
+                Animated.timing(this.state.margin, {
+                toValue: 15,
+                duration: 300
+              }),
+              Animated.timing(this.state.borderRadius, {
+                toValue: 5,
+                duration: 300
+              }),
+              Animated.timing( this.state.height, {
+                toValue: 200,
+                duration: 300
+              })
+            ])
           ]).start();
         }
       });
@@ -180,7 +197,7 @@ export default class DealTileVanilla extends Component {
     } = deal;
     return (
       <Animated.View style={[styles.container, {margin: this.state.margin, height: this.state.height, borderRadius: this.state.borderRadius }]} >
-        <View style={{flex: 1}}>
+        <Animated.View style={{flex: 1, opacity: this.state.tileOpacity}}>
           <TouchableOpacity onPress={onPress}>
             <View style={styles.topContainer} >
               <Image
@@ -230,7 +247,7 @@ export default class DealTileVanilla extends Component {
               </View>
             </Swiper>
           </Components.BlurView>
-        </View>
+        </Animated.View>
         {this.state.showDetail ? <DealDetailAll from={this.props.from}/> : null}
       </Animated.View>
     );

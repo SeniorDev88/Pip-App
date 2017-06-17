@@ -25,7 +25,7 @@ class TopBar extends React.Component {
   render() {
     return (
       <View
-        style={{
+        style={[{
           alignItems: "center",
           justifyContent: "space-between",
           flexDirection: 'row',
@@ -33,7 +33,7 @@ class TopBar extends React.Component {
           paddingHorizontal: 15,
           position: 'relative',
           top: 20
-        }}
+        }]}
       >
         <TouchableHighlight
           underlayColor="transparent"

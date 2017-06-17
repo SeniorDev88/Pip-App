@@ -97,16 +97,13 @@ export default class Overview extends Component {
   onCancel() {
     this.setState({ modalVisible: false });
   }
-  openDeal = () => {
-    PipEventEmitter.emit('hideTabBar');
-    PipEventEmitter.emit('tabDown');
+  openDeal = () => {    
     PipEventEmitter.emit('hideNavBar');
     PipEventEmitter.emit('navUp');
-    // this.props.navigation.getNavigator('master').push('dealDetailAll',
-    //   {
-    //     dealId: 1,
-    //     dealName: opportunities.dealName
-    //   });
+    setTimeout( () => {
+      PipEventEmitter.emit('hideTabBar');
+      PipEventEmitter.emit('tabDown');
+    }, 300);
   };
   pressedEventCallback = () => this.setState({ modalVisible: true });
   render() {

@@ -76,19 +76,18 @@ export default class Feed extends Component {
     this.setState({
       dealId: id,
       showDetail: true
-    },() => {
-      PipEventEmitter.emit('hideTabBar');
-      PipEventEmitter.emit('tabDown');
+    },() => {      
       PipEventEmitter.emit('hideNavBar');
       PipEventEmitter.emit('navUp');
+      setTimeout( () => {
+        PipEventEmitter.emit('hideTabBar');
+        PipEventEmitter.emit('tabDown');
+        this.setState({ hideOthers: true });
+        this.refs.scrollView.scrollTo({y: 0, animated: false});
+      }, 300);
       this.dealTiles[id].measure( (fx, fy, width, height, px, py) => {
         this.refs.scrollView.scrollTo({y: fy});
       });
-
-      Animated.delay(300).start(() => {
-        this.setState({ hideOthers: true });
-        this.refs.scrollView.scrollTo({y: 0, animated: false});
-      })
     });
   };
   openAddTag = () => this.props.navigator.push('addTag');
