@@ -1,5 +1,5 @@
-import React from "react";
-import { ScrollView, View, StyleSheet, Image, Text, Dimensions, TouchableOpacity } from "react-native";
+import React, { Component } from "react";
+import { ScrollView, View, StyleSheet, Image, Text, Dimensions, TouchableOpacity, Animated } from "react-native";
 import { scale, scaleByVertical } from '../constants/Layout';
 import Router from '../navigation/Router';
 import RelatedArticles from './RelatedArticles';
@@ -7,6 +7,7 @@ import Tag from './Tag';
 import Colors from '../constants/Colors';
 
 import PipEventEmitter from '../services/PipEventEmitter';
+import FullNews from './FullNews';
 
 const window = Dimensions.get('window');
 
@@ -14,14 +15,8 @@ const styles = StyleSheet.create({
   headerContainer: {
     flex: 1
   },
-  headerImageCont: {
-    paddingHorizontal: 15,
-    paddingBottom: 10,
-  },
   headerImage: {
-    width: window.width - 30,
     height: 250,
-    marginTop: scaleByVertical(50),
     borderRadius: scale(10),
     borderWidth: 1,
     borderColor: 'transparent'
@@ -66,53 +61,127 @@ const styles = StyleSheet.create({
   }
 });
 
-const onPressImage = (props) => {
-  PipEventEmitter.emit('hideNavBar');
-  PipEventEmitter.emit('navUp');
-  setTimeout( () => {
-    PipEventEmitter.emit('hideTabBar');
-    PipEventEmitter.emit('tabDown');
-  }, 300);
-  props.navigation.getNavigator('master').push(Router.getRoute('fullNews'));
-};
 
-const NewsList = (props) => {
-  const onPress = onPressImage.bind(this, props);
-  return (
-    <ScrollView>
-      <View style={styles.headerContainer}>
+export default class NewsList extends Component {
+  
+  constructor(props) {
+    super(props);
+    this.state = {
+      showDetail: false,
+      hideOthers: false,
+      hideDetail: true,
+      headerPadding: new Animated.Value(15),
+      contentMarginTop: new Animated.Value(0),
+      headerImageWidth: new Animated.Value(window.width - 30),
+      headerContentOpacity: new Animated.Value(1)
+    }
+    this.openDeal = this.openDeal.bind(this);
+    PipEventEmitter.addListener('hideDetail', (data) => {
+      if(data.from != 'news') { return; }
+      this.setState({ 
+        hideOthers: false,
+        hideDetail: true 
+      }, () => {
+        Animated.parallel([
+          Animated.timing( this.state.headerPadding, {
+            toValue: 15,
+            duration: 300
+          }),
+          Animated.timing( this.state.headerImageWidth, {
+            toValue: window.width - 30,
+            duration: 300
+          }),
+          Animated.timing( this.state.headerContentOpacity, {
+            toValue: 1,
+            duration: 300
+          }),
+          Animated.timing( this.state.contentMarginTop, {
+            toValue: 0,
+            duration: 300
+          })
+        ]).start( () => {
+          this.setState({ showDetail: false });
+        });
+      });
+    });
+  }
+  
+  openDeal = (id) => {    
+    this.setState({
+      dealId: id,
+      showDetail: true,
+      hideDetail: false,
+    },() => {
+      this.refs.scrollView.scrollTo({y: 0});
+      PipEventEmitter.emit('hideNavBar');
+      PipEventEmitter.emit('navUp');
+      setTimeout( () => {
+        PipEventEmitter.emit('hideTabBar');
+        PipEventEmitter.emit('tabDown');
+        this.setState({ hideOthers: true });
+      }, 300);
+      Animated.parallel([
+        Animated.timing( this.state.headerPadding, {
+          toValue: 0,
+          duration: 300
+        }),
+        Animated.timing( this.state.headerImageWidth, {
+          toValue: window.width,
+          duration: 300
+        }),
+        Animated.timing( this.state.headerContentOpacity, {
+          toValue: 0,
+          duration: 300
+        }),
+        Animated.timing( this.state.contentMarginTop, {
+          toValue: 300,
+          duration: 300
+        })
+      ]).start();
+    });
+  };
 
-        <View style={styles.headerImageCont}>
-          <TouchableOpacity onPress={onPress}>
-            <Image
-              source={require('../assets/images/NewsFeed/main-article-img.png')}
-              resizeMode="cover"
-              style={styles.headerImage}
-            >
-              <View style={styles.mainImageTextCont}>
-                <Tag text="Regulations" style={styles.mainImageText} />
+  render() {
+    return (
+      <ScrollView ref='scrollView'>
+        {this.state.hideOthers? null : 
+        <View style={{flex: 1}}>
+          <View style={styles.headerContainer}>
+            <Animated.View style={{padding: this.state.headerPadding}}>
+              <TouchableOpacity onPress={this.openDeal}>
+                <Animated.Image
+                  source={require('../assets/images/NewsFeed/main-article-img.png')}
+                  resizeMode="cover"
+                  style={[styles.headerImage, {width: this.state.headerImageWidth}]}
+                >
+                  <View style={styles.mainImageTextCont}>
+                    <Tag text="Regulations" style={styles.mainImageText} />
+                  </View>
+                </Animated.Image>
+              </TouchableOpacity>
+            </Animated.View>
+
+            
+            <Animated.View style={{flex: 1, opacity: this.state.headerContentOpacity}}>
+              <Text style={styles.headerText}>Crowdfunding Julia Groves: “FCA Review Is Most Welcome”</Text>
+
+              <View style={styles.subHeaderTextCont}>
+                <Text style={styles.subHeaderSource}>Crowdfunding Insider</Text>
+                <Text style={styles.subHeaderHours}>3h</Text>
               </View>
-            </Image>
-          </TouchableOpacity>
-        </View>
+            </Animated.View>
 
-        <Text style={styles.headerText}>Crowdfunding Julia Groves: “FCA Review Is Most Welcome”</Text>
+          </View>
+          <Animated.View style={[styles.articles, {marginTop: this.state.contentMarginTop} ]}>
+            <RelatedArticles
+              articles={this.props.list}
+              onPress={this.openDeal}
+            />
+          </Animated.View>
+        </View>}
+        {this.state.showDetail ? <FullNews hideDetail={this.state.hideDetail} /> : null}
+      </ScrollView>
+    );
+  }
+}
 
-
-        <View style={styles.subHeaderTextCont}>
-          <Text style={styles.subHeaderSource}>Crowdfunding Insider</Text>
-          <Text style={styles.subHeaderHours}>3h</Text>
-        </View>
-
-      </View>
-      <View style={styles.articles}>
-        <RelatedArticles
-          articles={props.list}
-          onPress={onPress}
-        />
-      </View>
-    </ScrollView>
-  );
-};
-
-export default NewsList;

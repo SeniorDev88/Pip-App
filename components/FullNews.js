@@ -1,9 +1,11 @@
 import React from "react";
-import { Text, View, ScrollView, TouchableOpacity, Image, StyleSheet, Dimensions, Linking, StatusBar } from "react-native";
+import { Text, View, ScrollView, TouchableOpacity, Image, StyleSheet, Dimensions, Linking, StatusBar, Animated } from "react-native";
 import { scale, scaleByVertical } from '../constants/Layout';
 import Tag from '../components/Tag';
 import Colors from '../constants/Colors';
 import NavigatorButton from '../components/NavigatorButton';
+
+import PipEventEmitter from '../services/PipEventEmitter';
 
 const window = Dimensions.get('window');
 
@@ -125,14 +127,56 @@ export default class FullNews extends React.Component {
     }
   };
 
+  constructor(props) {
+    super(props);
+    this.state = {
+      opacity: new Animated.Value(0),
+      contentMarginTop: new Animated.Value(300)
+    }
+  }
+
+  componentDidMount() {
+    Animated.parallel([
+      Animated.timing( this.state.contentMarginTop, {
+        toValue: 0,
+        duration: 300
+      }),
+      Animated.timing( this.state.opacity, {
+        toValue: 1,
+        duration: 300
+      })
+    ]).start();
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if(nextProps.hideDetail) {
+      Animated.parallel([
+        Animated.timing( this.state.contentMarginTop, {
+          toValue: 300,
+          duration: 300
+        }),
+      Animated.timing( this.state.opacity, {
+        toValue: 0,
+        duration: 300
+      })
+      ]).start();
+    }
+  }
 
   onPressBackArrow = () => {
-    this.props.navigator.pop();
+    PipEventEmitter.emit('hideDetail', {from: 'news'});
+    PipEventEmitter.emit('showTabBar');
+    PipEventEmitter.emit('tabUp');
+
+    setTimeout( () => {
+      PipEventEmitter.emit('showNavBar');
+      PipEventEmitter.emit('navDown');
+    }, 300);
   }
 
   render() {
     return (
-      <ScrollView style={styles.container}>
+      <Animated.ScrollView style={[styles.container, {opacity: this.state.opacity}]}>
         <StatusBar
           translucent={false}
           hidden={false}
@@ -198,7 +242,7 @@ export default class FullNews extends React.Component {
           onPress={() => Linking.openURL('http://example.com')}
           style={styles.button}
         />
-      </ScrollView>
+      </Animated.ScrollView>
     );
   }
 }
