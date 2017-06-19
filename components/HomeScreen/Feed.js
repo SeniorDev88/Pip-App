@@ -66,29 +66,38 @@ export default class Feed extends Component {
     PipEventEmitter.addListener('hideDetail', (data) => {
       if(data.from != 'feed') { return; }
       this.setState({
+        dealId: '',
         showDetail: false,
         hideOthers: false
       });
     });
   }
 
+  animateTile = (id) => {
+    return new Promise( (resolve, reject) => {
+      PipEventEmitter.emit('hideNavBar');
+      PipEventEmitter.emit('navUp');
+      this.dealTiles[id].measure( (fx, fy, width, height, px, py) => {
+        this.refs.scrollView.scrollTo({y: fy});
+        resolve("done");
+      });
+    });
+  }
+  
   openDeal = (id) => {    
     this.setState({
       dealId: id,
       showDetail: true
-    },() => {      
-      PipEventEmitter.emit('hideNavBar');
-      PipEventEmitter.emit('navUp');
-      setTimeout( () => {
-        PipEventEmitter.emit('hideTabBar');
-        PipEventEmitter.emit('tabDown');
-        this.setState({ hideOthers: true });
-        this.refs.scrollView.scrollTo({y: 0, animated: false});
-      }, 300);
-      this.dealTiles[id].measure( (fx, fy, width, height, px, py) => {
-        this.refs.scrollView.scrollTo({y: fy});
+    },() => {
+      this.animateTile(id).then(()=>{
+        setTimeout( () => {
+          PipEventEmitter.emit('hideTabBar');
+          PipEventEmitter.emit('tabDown');
+          this.setState({ hideOthers: true });
+          this.refs.scrollView.scrollTo({y: 0, animated: false});
+        }, 300);
       });
-    });
+    });      
   };
   openAddTag = () => this.props.navigator.push('addTag');
   openAllPips = () => this.props.navigator.push('mostViewed');

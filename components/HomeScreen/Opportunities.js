@@ -219,31 +219,37 @@ export default class Opportunities extends Component {
   }
   pressedEventCallback = () => this.setState({ modalVisible: true });
 
+  animateTile = (id) => {
+    return new Promise( (resolve, reject) => {
+      PipEventEmitter.emit('hideNavBar');
+      PipEventEmitter.emit('navUp');
+      this.dealTiles[id].measure( (fx, fy, width, height, px, py) => {
+        this.refs.scrollView.scrollTo({y: fy});
+        resolve("done");
+      });
+    });
+  }
+
   openDeal = (id) => {
     this.setState({
       dealId: id,
       showDetail: true
     },() => {
-      PipEventEmitter.emit('hideNavBar');
-      PipEventEmitter.emit('navUp');
-      setTimeout( () => {
-        PipEventEmitter.emit('hideTabBar');
-        PipEventEmitter.emit('tabDown');
-      }, 300);
-      this.dealTiles[id].measure( (fx, fy, width, height, px, py) => {
-        this.refs.scrollView.scrollTo({y: fy});
-      });
-
       Animated.sequence([
         Animated.delay(300),
         Animated.timing( this.state.titleMarginTop, {
           toValue: -49,
           duration: 300
         })
-      ]).start( () => {
-        this.refs.scrollView.scrollTo({y: 0, animated: false});
-        this.setState({ hideOthers: true });
-      })
+      ]).start();
+      this.animateTile(id).then(()=>{
+        setTimeout( () => {
+          PipEventEmitter.emit('hideTabBar');
+          PipEventEmitter.emit('tabDown');
+          this.setState({ hideOthers: true });
+          this.refs.scrollView.scrollTo({y: 0, animated: false});
+        }, 300);
+      });
     });
   };
 

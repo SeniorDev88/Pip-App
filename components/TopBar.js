@@ -18,8 +18,11 @@ class TopBar extends React.Component {
       PipEventEmitter.emit('hideDetail', {from: this.props.from});
       PipEventEmitter.emit('showTabBar');
       PipEventEmitter.emit('tabUp');
-      PipEventEmitter.emit('showNavBar');
-      PipEventEmitter.emit('navDown');
+
+      setTimeout( () => {
+        PipEventEmitter.emit('showNavBar');
+        PipEventEmitter.emit('navDown');
+      }, 300);
   }
 
   render() {

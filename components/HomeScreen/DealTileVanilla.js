@@ -11,6 +11,7 @@ import DealDetailAll from '../DealDetail/DealDetailAll';
 
 const styles = StyleSheet.create({
   container: {
+    position: 'relative',
     borderColor: Colors.dirtyWhite,
     borderWidth: 1,
     borderStyle: 'solid',
@@ -49,10 +50,7 @@ const styles = StyleSheet.create({
   },
   bottomContainer: {
     zIndex: 1,
-    position: 'absolute',
-    right: 0,
-    bottom: 0,
-    left: 0,
+    marginTop: -40,
     height: 40,
   },
   slide1: {
@@ -123,63 +121,60 @@ export default class DealTileVanilla extends Component {
 
   componentWillReceiveProps(nextProps) {
     if(nextProps.showDetail != this.state.showDetail) {
-      this.setState({ showDetail: nextProps.showDetail}, () => {
-        if(nextProps.showDetail) {
-          Animated.sequence([
-            Animated.parallel([
-              Animated.timing(this.state.margin, {
-                toValue: 0,
-                duration: 300
-              }),
-              Animated.timing(this.state.borderRadius, {
-                toValue: 0,
-                duration: 300
-              }),
-              Animated.timing( this.state.height, {
-                toValue: Dimensions.get('window').height,
-                duration: 300
-              })
-            ]),
-            Animated.parallel([
-              Animated.timing( this.state.tileBottomTop, {
-                toValue: 158,
-                duration: 300
-              }),              
-              Animated.timing( this.state.tileOpacity, {
-                toValue: 0,
-                duration: 300
-              })
-            ])
-          ]).start();
-        } else {
-          Animated.sequence([
-            Animated.parallel([
-              Animated.timing( this.state.tileBottomTop, {
-                toValue: 140,
-                duration: 300
-              }),              
-              Animated.timing( this.state.tileOpacity, {
-                toValue: 1,
-                duration: 300
-              }),
-            ]),
-            Animated.parallel([
-                Animated.timing(this.state.margin, {
-                toValue: 15,
-                duration: 300
-              }),
-              Animated.timing(this.state.borderRadius, {
-                toValue: 5,
-                duration: 300
-              }),
-              Animated.timing( this.state.height, {
-                toValue: 200,
-                duration: 300
-              })
-            ])
-          ]).start();
-        }
-      });
+      if(nextProps.showDetail) {
+        this.setState({ showDetail: nextProps.showDetail});
+        Animated.sequence([
+          Animated.parallel([
+            Animated.timing(this.state.margin, {
+              toValue: 0,
+              duration: 300
+            }),
+            Animated.timing(this.state.borderRadius, {
+              toValue: 0,
+              duration: 300
+            }),
+            Animated.timing( this.state.height, {
+              toValue: Dimensions.get('window').height,
+              duration: 300
+            }),
+            Animated.timing( this.state.tileBottomTop, {
+              toValue: 158,
+              duration: 300
+            })
+          ]),
+          Animated.timing( this.state.tileOpacity, {
+            toValue: 0,
+            duration: 300
+          })
+        ]).start();
+      } else {          
+        Animated.sequence([                        
+          Animated.timing( this.state.tileOpacity, {
+            toValue: 1,
+            duration: 300
+          }),          
+          Animated.parallel([
+            Animated.timing( this.state.tileBottomTop, {
+              toValue: 140,
+              duration: 300
+            }),  
+            Animated.timing(this.state.margin, {
+              toValue: 15,
+              duration: 300
+            }),
+            Animated.timing(this.state.borderRadius, {
+              toValue: 5,
+              duration: 300
+            }),
+            Animated.timing( this.state.height, {
+              toValue: 200,
+              duration: 300
+            })
+          ])
+        ]).start( () => {
+          this.setState({ showDetail: nextProps.showDetail});
+        });
+      }
     }
   }
 
@@ -197,7 +192,7 @@ export default class DealTileVanilla extends Component {
     } = deal;
     return (
       <Animated.View style={[styles.container, {margin: this.state.margin, height: this.state.height, borderRadius: this.state.borderRadius }]} >
-        <Animated.View style={{flex: 1, opacity: this.state.tileOpacity}}>
+        <Animated.View style={{flex: 1, opacity: this.state.tileOpacity, position: 'relative'}}>
           <TouchableOpacity onPress={onPress}>
             <View style={styles.topContainer} >
               <Image
@@ -248,7 +243,7 @@ export default class DealTileVanilla extends Component {
             </Swiper>
           </Components.BlurView>
         </Animated.View>
-        {this.state.showDetail ? <DealDetailAll from={this.props.from}/> : null}
+        {this.state.showDetail ? <DealDetailAll showDetail={this.props.showDetail} from={this.props.from}/> : null}
       </Animated.View>
     );
   }

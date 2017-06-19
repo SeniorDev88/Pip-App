@@ -23,7 +23,7 @@ import PlatformLogo from "../PlatformLogo";
 
 const window = Dimensions.get('window');
 const ROW_HEIGHT = 60;
-const PARALLAX_HEADER_HEIGHT = 178;
+const PARALLAX_HEADER_HEIGHT = 218;
 const STICKY_HEADER_HEIGHT = 60;
 const WIDTH = window.width;
 
@@ -89,20 +89,63 @@ class DealDetailAll extends Component {
     super(props);
     this.state = {
       opacity: new Animated.Value(0),
+      headerOpacity: new Animated.Value(0),
       contentMarginTop: new Animated.Value(300),
       backgroundColor: 'transparent',
     }
   }
 
   componentDidMount() {
-    Animated.timing( this.state.opacity, {
-      toValue: 1,
-      duration: 300
-    }).start( () => {
+    Animated.sequence([
+      Animated.parallel([
+        Animated.timing( this.state.opacity, {
+          toValue: 1,
+          duration: 300
+        }),
+        Animated.timing( this.state.contentMarginTop, {
+          toValue: 0,
+          duration: 300
+        })
+      ]),      
+      Animated.timing( this.state.headerOpacity, {
+        toValue: 1,
+        duration: 300,
+      })
+    ]).start( () => {
       this.setState({
         backgroundColor: "#00EBC2"
-      })
+      });      
     });
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if(!nextProps.showDetail) {
+      this.setState({
+        backgroundColor: "transparent"
+      }, () => {
+        Animated.sequence([
+          Animated.timing( this.state.headerOpacity, {
+            toValue: 0,
+            duration: 300,
+          }),
+          Animated.parallel([
+            Animated.timing( this.state.opacity, {
+              toValue: 0,
+              duration: 300
+            }),
+            Animated.timing( this.state.contentMarginTop, {
+              toValue: 300,
+              duration: 300
+            })
+          ])
+        ]).start();
+      });
+      ( () => {
+        this.setState({
+          backgroundColor: "#00EBC2"
+        });
+      });
+    }
   }
 
   render() {
@@ -115,11 +158,11 @@ class DealDetailAll extends Component {
           parallaxHeaderHeight={PARALLAX_HEADER_HEIGHT}
           backgroundSpeed={10}
           renderBackground={() => (
-            <View key="background">
+            <Animated.View key="background" style={{opacity: this.state.headerOpacity}}>
               <Image
                 source={{ uri: 'http://cdn.thegadgetflow.com/wp-content/uploads/2016/02/cocoon-smart-home-security-01.jpg',
                   width: window.width,
-                  height: PARALLAX_HEADER_HEIGHT }}
+                  height: PARALLAX_HEADER_HEIGHT - 40 }}
               />
               <View
                 style={{ position: 'absolute',
@@ -127,7 +170,8 @@ class DealDetailAll extends Component {
                   width: window.width,
                   height: PARALLAX_HEADER_HEIGHT }}
               />
-            </View>
+              <DealDetailLogo />
+            </Animated.View>
           )}
           renderForeground={() => (<TopBar from={this.props.from}/>)}
           renderStickyHeader={() => (
@@ -143,29 +187,30 @@ class DealDetailAll extends Component {
             translucent={false}
             hidden={false}
           />
-          <DealDetailLogo />
-          <DealDetailTitle />
-          <DealDetailLocation />
-          <DealDetailDescription />
-          <ProgressBar completePercentage={30} />
-          <Text
-            style={{
-              fontFamily: "GothamRounded-Book",
-              fontSize: 12,
-              lineHeight: 29,
-              color: "#388ba7",
-              textAlign: "center"
-            }}
-          >30% funded</Text>
-          <FundingStatistics />
-          <PlatformLogo
-            logoPath="http://3xrowsd5xzn1nczoz32qcdku.wpengine.netdna-cdn.com/wp-content/uploads/2016/03/Crowdcube_logo_exclusion_3a40fc925656b045955d392d7e9f9c80.jpg"
-            style={{
-              marginBottom: 20
-            }}
-          />
-          <SectionTabs />
-          <RiskWarning />
+          <Animated.View style={{flex:1, marginTop: this.state.contentMarginTop}}>
+            <DealDetailTitle />
+            <DealDetailLocation />
+            <DealDetailDescription />
+            <ProgressBar completePercentage={30} />
+            <Text
+              style={{
+                fontFamily: "GothamRounded-Book",
+                fontSize: 12,
+                lineHeight: 29,
+                color: "#388ba7",
+                textAlign: "center"
+              }}
+            >30% funded</Text>
+            <FundingStatistics />
+            <PlatformLogo
+              logoPath="http://3xrowsd5xzn1nczoz32qcdku.wpengine.netdna-cdn.com/wp-content/uploads/2016/03/Crowdcube_logo_exclusion_3a40fc925656b045955d392d7e9f9c80.jpg"
+              style={{
+                marginBottom: 20
+              }}
+            />
+            <SectionTabs />
+            <RiskWarning />
+          </Animated.View>
         </ParallaxScrollView>
       </Animated.View>
     );

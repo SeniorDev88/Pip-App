@@ -67,10 +67,12 @@ const styles = StyleSheet.create({
 });
 
 const onPressImage = (props) => {
-  PipEventEmitter.emit('hideTabBar');
-  PipEventEmitter.emit('tabDown');
   PipEventEmitter.emit('hideNavBar');
   PipEventEmitter.emit('navUp');
+  setTimeout( () => {
+    PipEventEmitter.emit('hideTabBar');
+    PipEventEmitter.emit('tabDown');
+  }, 300);
   props.navigation.getNavigator('master').push(Router.getRoute('fullNews'));
 };
 

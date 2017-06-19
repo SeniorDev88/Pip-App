@@ -56,7 +56,7 @@ function forInitial(props: NavigationSceneRendererProps): Object {
   const focused = navigationState.index === scene.index;
   const opacity = focused ? 1 : 0;
   // If not focused, move the scene to the far away.
-  const translate = focused ? 0 : 1000000;
+  const translate = focused ? 0 : 300000;
   return {
     opacity,
     transform: [
